@@ -6,7 +6,7 @@ const maxLifeSet = 100;
 let currentMonsterHealthBar = maxLifeSet;
 let currentPlayerHealthBar = maxLifeSet;
 let bonusLifeAvailable = true;
-let bonusLifeValue = 0.1;
+const bonusLifeValue = 0.1;
 
 adjustHealthBars(maxLifeSet);
 
