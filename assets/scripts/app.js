@@ -5,6 +5,8 @@ const healValue = 20;
 const maxLifeSet = 100;
 let currentMonsterHealthBar = maxLifeSet;
 let currentPlayerHealthBar = maxLifeSet;
+let bonusLifeAvailable = true;
+let bonusLifeValue = 0.1;
 
 adjustHealthBars(maxLifeSet);
 
@@ -14,7 +16,12 @@ function currentHealthBars(barValue) {
 }
 
 function resultCheck(monsterH, playerH){
-    if (monsterH <= 0 && playerH > 0){
+    if (playerH <= 0 && bonusLifeAvailable){
+        currentPlayerHealthBar = bonusLifeValue;
+        setPlayerHealth(bonusLifeValue)
+        removeBonusLife();
+        bonusLifeAvailable = false;
+    } else if (monsterH <= 0 && playerH > 0){
         alert('You won!');
         resetGame(maxLifeSet);
         currentHealthBars(maxLifeSet);
