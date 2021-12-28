@@ -1,14 +1,48 @@
 const attackValue = 10;
 const strongAttackValue = 15
 const healValue = 20;
-
-const maxLifeSet = 100;
-let currentMonsterHealthBar = maxLifeSet;
-let currentPlayerHealthBar = maxLifeSet;
-let bonusLifeAvailable = true;
 const bonusLifeValue = 0.1;
+const modeAttack = 'ATTACK';
+const modeStrongAttack = 'STRONG_ATTACK';
+const logPlayerAttack = 'PLAYER_ATTACK';
+const logPlayerStrongAttack = 'PLAYER_STRONG_ATTACK';
+const logMonsterAttack = 'MONSTER_ATTACK';
+const logPlayerHeal = 'PLAYER_HEAL';
+const logGameOver = 'GAME_OVER';
 
-adjustHealthBars(maxLifeSet);
+
+let currentMonsterHealthBar;
+let currentPlayerHealthBar;
+let maxLifeSet;
+let bonusLifeAvailable = true;
+let storeLog = [];
+
+enteredValue = prompt("Enter the number to set life values.", "100")
+
+function saveLog(ev, val, monsterHealth, playerHealth) {
+    let logEntry = {
+        event: ev,
+        value: val,
+        finalMonsterHealth: monsterHealth,
+        finalPlayerHealth: playerHealth,
+    };
+    if (ev === logPlayerAttack || ev === logPlayerStrongAttack) {
+        logEntry.target = 'MONSTER';
+    } else if (ev === logPlayerHeal) {
+        logEntry.target = 'PLAYER';
+    }
+    storeLog.push(logEntry);
+}
+
+if (enteredValue < 0) {
+    alert("Number entered was too small, life value was set to default - 100")
+    maxLifeSet = 100
+} else {
+    maxLifeSet = parseInt(enteredValue);
+    adjustHealthBars(maxLifeSet);
+    currentMonsterHealthBar = maxLifeSet;
+    currentPlayerHealthBar = maxLifeSet;
+}
 
 function currentHealthBars(barValue) {
     currentMonsterHealthBar = barValue;
@@ -25,21 +59,31 @@ function resultCheck(monsterH, playerH){
         alert('You won!');
         resetGame(maxLifeSet);
         currentHealthBars(maxLifeSet);
+        addBonusLife();
+        bonusLifeAvailable = true;
+        saveLog(logGameOver, 'PLAYER WON !', currentMonsterHealthBar, currentPlayerHealthBar);
     } else if (playerH <= 0 && monsterH > 0){
         alert('You Lose!');
         resetGame(maxLifeSet);
         currentHealthBars(maxLifeSet);
+        addBonusLife();
+        bonusLifeAvailable = true;
+        saveLog(logGameOver, 'MONSTER WON !', currentMonsterHealthBar, currentPlayerHealthBar);
     } else if (monsterH <= 0 && playerH <=0){
         alert("it's a draw !");
         resetGame(maxLifeSet);
         currentHealthBars(maxLifeSet);
+        addBonusLife();
+        bonusLifeAvailable = true;
+        saveLog(logGameOver, 'IT IS A DRAW !', currentMonsterHealthBar, currentPlayerHealthBar);
     }
 }
 
 function monsterAttackTrigger() {
-    if (currentMonsterHealthBar < 100) {
+    if (currentMonsterHealthBar < maxLifeSet) {
         const damagePlayer = dealPlayerDamage(attackValue);
         currentPlayerHealthBar -= damagePlayer;
+        saveLog(logMonsterAttack, damagePlayer, currentMonsterHealthBar, currentPlayerHealthBar);
     }
     else {
         return;
@@ -47,41 +91,52 @@ function monsterAttackTrigger() {
 }
 
 function attackMode(mode) {
-    if (mode === 'ATTACK'){
+    let logMode;
+    if (mode === modeAttack){
         const damageMonster = dealMonsterDamage(attackValue);
         currentMonsterHealthBar -= damageMonster;
+        saveLog(logPlayerAttack, damageMonster, currentMonsterHealthBar, currentPlayerHealthBar);
         resultCheck(currentMonsterHealthBar, currentPlayerHealthBar);
         monsterAttackTrigger();
     } else {
         const damageMonster = dealMonsterDamage(strongAttackValue);
         currentMonsterHealthBar -= damageMonster;
+        saveLog(logPlayerStrongAttack, damageMonster, currentMonsterHealthBar, currentPlayerHealthBar);
         resultCheck(currentMonsterHealthBar, currentPlayerHealthBar);
         monsterAttackTrigger();
     }
 }
 
 function attackTrigger() {
-    attackMode('ATTACK')
+    attackMode(modeAttack)
     resultCheck(currentMonsterHealthBar, currentPlayerHealthBar);
 }
 
 function strongAttackTrigger() {
-    attackMode('STRONG_ATTACK')
+    attackMode(modeStrongAttack)
     resultCheck(currentMonsterHealthBar, currentPlayerHealthBar);
 }
 
 function healPlayer() {
     let healValueFunc;
+    let healed;
     if (currentPlayerHealthBar >= maxLifeSet - healValue){
         alert("You can't heal more than your maximum life");
         healValueFunc = maxLifeSet - currentPlayerHealthBar;
     } else {
         healValueFunc = healValue;
+        healed = true;
     }
     increasePlayerHealth(healValueFunc);
     currentPlayerHealthBar += healValueFunc;
+    saveLog(logPlayerHeal, healValueFunc, currentMonsterHealthBar, currentPlayerHealthBar);
+}
+
+function printLog() {
+    console.log(storeLog);
 }
 
 attackBtn.addEventListener('click',attackTrigger)
 strongAttackBtn.addEventListener('click',strongAttackTrigger)
 healBtn.addEventListener('click', healPlayer)
+logBtn.addEventListener('click', printLog)
