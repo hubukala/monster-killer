@@ -133,7 +133,9 @@ function healPlayer() {
 }
 
 function printLog() {
-    console.log(storeLog);
+    for (let i = 0; i < storeLog.length; i++){
+        console.log(storeLog[i]);
+    };
 }
 
 attackBtn.addEventListener('click',attackTrigger)
