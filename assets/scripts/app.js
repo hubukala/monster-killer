@@ -35,6 +35,7 @@ function saveLog(ev, val, monsterHealth, playerHealth) {
 }
 
 if (enteredValue < 0 || isNaN(enteredValue)) {
+    alert("Invalid input, it's not a number!");
     throw {message: "Invalid input, it's not a number!"};
 } else {
     maxLifeSet = parseInt(enteredValue);
