@@ -34,9 +34,8 @@ function saveLog(ev, val, monsterHealth, playerHealth) {
     storeLog.push(logEntry);
 }
 
-if (enteredValue < 0) {
-    alert("Number entered was too small, life value was set to default - 100")
-    maxLifeSet = 100
+if (enteredValue < 0 || isNaN(enteredValue)) {
+    throw {message: "Invalid input, it's not a number!"};
 } else {
     maxLifeSet = parseInt(enteredValue);
     adjustHealthBars(maxLifeSet);
